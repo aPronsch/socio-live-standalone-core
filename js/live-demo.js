@@ -68,6 +68,10 @@ var options = {
   suffix : ''
 };
 
+var userParams = {
+  number: 3
+};
+
 var $title = $('title');
 var $eventName = $('[name="event_name"]');
 var $settingsPanel = $('div[class="panel-inner"]');
@@ -170,6 +174,7 @@ function openAttendeeDrawing() {
   var $slotMachine = $('#planeMachine');
   $slotMachine.empty();
   temporary = true;
+  setupUsers();
   setupSlotMachine(users);
 
   $('#start-stop-button').off('click').on('click', function(e) {
@@ -199,20 +204,22 @@ function openAttendeeDrawing() {
 function setupSlotMachine(usersDictionary) {
   var $carousel = $('#carousel');
   var current = 0;
-  for(var key in usersDictionary) {
-    var thisUser = usersDictionary[key];
-    orderedUsers[current] = {index: current, id: thisUser.id, user: thisUser};
-    current = current + 1;
-  }
+  if(usersDictionary != null){
+    for(var key in usersDictionary) {
+      var thisUser = usersDictionary[key];
+      orderedUsers[current] = {index: current, id: thisUser.id, user: thisUser};
+      current = current + 1;
+    }
 
-  var figures = $carousel.find('figure');
-  for(var i = 0; i < 6 && i < orderedUsers.length; i++) {
-    figures[i].appendChild(orderedUsers[i].user.buildHtmlForAttendeeDrawing());
-  }
-  nextUser = i + 1;
+    var figures = $carousel.find('figure');
+    for(var i = 0; i < 6 && i < orderedUsers.length; i++) {
+      figures[i].appendChild(orderedUsers[i].user.buildHtmlForAttendeeDrawing());
+    }
+    nextUser = i + 1;
 
-  control.speed = 2000;
-  runControl()
+    control.speed = 2000;
+    runControl()
+  }
 }
 
 function closeAttendeeDrawing() {
@@ -257,6 +264,34 @@ var industriesCollection = "Accounting,Airlines/Aviation,Alternative Dispute Res
 var industriesHash = {};
 for(var i = 0; i < industriesCollection.length; i++) {
   industriesHash[industriesCollection[i]] = 0;
+}
+
+  // Parse CSV file into list of users for carousel drawing
+
+function setupUsers(){
+  // file location temporary until upload function implemented
+  readTextFile("examples/simple-example-1.csv", function(fileText) {
+    if(fileText != undefined){
+        var usersRead = {};
+        users = null;
+        var entries = fileText.split(/[\r]?[\n]|[\r]/);
+        //console.log(JSON.stringify(fileText));
+        for(var key in entries){
+          var params = entries[key].split(",")
+          console.log(params)
+          if (params.length != userParams.number) {
+            alert("Error: entries must contain " + userParams.number + "fields:\n [First Name],[Last Name],[Company]");
+            return;
+          }
+          //TODO: implement arbitrary number of parameters.
+          usersRead[key] = new BasicUser(key, params[0], params[1], params[2], Date.now());
+        }
+        console.log(usersRead)
+        users = usersRead;
+        return;
+    }
+    return;
+  });
 }
 
 ( function updateInstrustries() {
