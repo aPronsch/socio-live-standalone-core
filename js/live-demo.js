@@ -168,8 +168,19 @@ function runControl() {
   }, control.speed);
 }
 
+function openUploadWindow() {
+ $("#uploadContainer").addClass('animated zoomIn')
+ $("#uploadContainer").css({
+   visibility:'visible'
+ });
+
+
+}
+
 function openAttendeeDrawing() {
+  openUploadWindow()
   document.getElementById('attendee-drawing-overlay').style.width = "100%";
+  
 
   var $slotMachine = $('#planeMachine');
   $slotMachine.empty();
@@ -225,6 +236,7 @@ function setupSlotMachine(usersDictionary) {
 function closeAttendeeDrawing() {
   document.getElementById('attendee-drawing-overlay').style.width = "0%";
 
+
   $('#carousel').find('figure').empty();
   clearInterval(control.interval);
   var $startStopBtn = $('#start-stop-button');
@@ -232,11 +244,19 @@ function closeAttendeeDrawing() {
   $startStopBtn.html('SPIN');
 }
 
+function closeUploadWindow(){
+  $("#uploadContainer").removeClass('animated zoomIn')
+  $("#uploadContainer").css({
+   visibility:'hidden'
+ });
+}
+
 var attendees = new CountUp("attendeesCount", 0, 0, 0, 2.5, options);
 attendees.start();
 var handshakes = new CountUp("handshakesCount", 0, 0, 0, 2.5, options);
 handshakes.start();
 var $industriesList = $('#industriesList');
+
 
 
 

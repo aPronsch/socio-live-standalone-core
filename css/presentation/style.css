@@ -536,6 +536,8 @@ header .mouse a {
     color: #16b6ea;
     padding-right: 5px;
 }
+
+
 /* ================================= */
 /* :::::::::: 7. Google map :::::::: */
 /* ================================= */
@@ -839,4 +841,46 @@ footer a:hover {
         -webkit-background-size: cover;
         background-position: center;
     }
+}
+
+/* ================================= */
+/* ::::: 10. Pop-up Containers ::::: */
+/* ================================= */
+
+.pop-up{
+    position: absolute;
+    top: 50%;
+    visibility:hidden;
+    background-color: #FFFFFF;
+    margin-right:25%;
+    margin-left:25%;
+    padding: 24px;
+    text-align: center;
+}
+
+.pop-up .closebtn {
+    position: absolute;
+    top: 20px;
+    right:24px;
+    font-size: 40px;
+}
+
+#uploadContainer {
+    height: 400px;
+    z-index: 1;
+    -webkit-transform: translateY(-50%);
+    -moz-transform:    translateY(-50%);
+    -ms-transform:     translateY(-50%);
+    -o-transform:      translateY(-50%);
+    transform:         translateY(-50%);
+
+    -webkit-animation-duration: 0.5s;
+    -moz-animation-duration:    0.5s;
+    -ms-animation-duration:     0.5s;
+    -o-animation-duration:      0.5s;
+    animation-duration:         0.5s;
+}
+
+#uploadHead {
+    margin-top: 48px;
 }
