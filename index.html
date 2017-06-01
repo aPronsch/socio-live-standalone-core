@@ -165,16 +165,21 @@
 
 <div class="pop-up" id="uploadContainer">
 
-   <a href="javascript:void(0)" class="closebtn" style="z-index: 1000" onclick="closeUploadWindow()">&times;</a>
-
-   <h1 id="uploadHead">
-       Upload your list of attendees for the drawing            
-    </h1>
-    <div class="col-md-12 col-lg-8 col-lg-offset-2" style="text-align: center; margin-top: 22%; margin-bottom: 5%;">
-            <button id="upload-button" class="start-stop-button">
+   
+   <div id="uploadContent">
+        <!--<a href="javascript:void(0)" class="closebtn" style="z-index: 1000" onclick="closeUploadWindow()">&times;</a>-->
+       <h1 id="uploadHead">
+           Upload your list of attendees for the drawing            
+        </h1>
+        <form id="uploadForm">
+            <input type="file" name="attendeeUpload" id="attendeeFile" >
+                
+            </input>
+        </form>
+        <button id="uploadButton" class="start-stop-button" onclick="setupUsers()">
                 UPLOAD
             </button>
-        </div>
+    </div>
 </div>
 
 <!-- END HEADER -->

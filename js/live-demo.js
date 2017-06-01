@@ -76,7 +76,8 @@ var $title = $('title');
 var $eventName = $('[name="event_name"]');
 var $settingsPanel = $('div[class="panel-inner"]');
 
-var users = {
+var users = {}
+/*var users = {
   1: new BasicUser(1, "Desmond", "Strickland", "Fishery", Date.now()),
   2: new BasicUser(2, 'Thaddeus','Galvan','Professional Training & Coaching', Date.now()),
   3: new BasicUser(3, 'Lamont','Friedman','Automotive', Date.now()),
@@ -102,7 +103,7 @@ var users = {
   23: new BasicUser(23, 'Britney','Pennington','Recreational Facilities and Services', Date.now()),
   24: new BasicUser(24, 'Phyllis','Chung','International Affairs', Date.now()),
   25: new BasicUser(25, 'Susanne','Clark','Facilities Services', Date.now())
-};
+};*/
 
 var orderedUsers = [];
 var nextUser = 0;
@@ -181,12 +182,31 @@ function openAttendeeDrawing() {
   openUploadWindow()
   document.getElementById('attendee-drawing-overlay').style.width = "100%";
   
+}
+
+function setupSlotMachine(usersDictionary) {
+  var $carousel = $('#carousel');
+  var current = 0;
+  if(usersDictionary != null){
+    for(var key in usersDictionary) {
+      var thisUser = usersDictionary[key];
+      orderedUsers[current] = {index: current, id: thisUser.id, user: thisUser};
+      current = current + 1;
+    }
+
+    var figures = $carousel.find('figure');
+    for(var i = 0; i < 6 && i < orderedUsers.length; i++) {
+      figures[i].appendChild(orderedUsers[i].user.buildHtmlForAttendeeDrawing());
+    }
+    nextUser = i + 1;
+
+    control.speed = 2000;
+    runControl()
+  }
 
   var $slotMachine = $('#planeMachine');
   $slotMachine.empty();
   temporary = true;
-  setupUsers();
-  setupSlotMachine(users);
 
   $('#start-stop-button').off('click').on('click', function(e) {
 
@@ -212,30 +232,9 @@ function openAttendeeDrawing() {
   })
 }
 
-function setupSlotMachine(usersDictionary) {
-  var $carousel = $('#carousel');
-  var current = 0;
-  if(usersDictionary != null){
-    for(var key in usersDictionary) {
-      var thisUser = usersDictionary[key];
-      orderedUsers[current] = {index: current, id: thisUser.id, user: thisUser};
-      current = current + 1;
-    }
-
-    var figures = $carousel.find('figure');
-    for(var i = 0; i < 6 && i < orderedUsers.length; i++) {
-      figures[i].appendChild(orderedUsers[i].user.buildHtmlForAttendeeDrawing());
-    }
-    nextUser = i + 1;
-
-    control.speed = 2000;
-    runControl()
-  }
-}
-
 function closeAttendeeDrawing() {
   document.getElementById('attendee-drawing-overlay').style.width = "0%";
-
+  closeUploadWindow();
 
   $('#carousel').find('figure').empty();
   clearInterval(control.interval);
@@ -290,7 +289,15 @@ for(var i = 0; i < industriesCollection.length; i++) {
 
 function setupUsers(){
   // file location temporary until upload function implemented
-  readTextFile("examples/simple-example-1.csv", function(fileText) {
+  input = document.getElementById("attendeeFile").files[0];
+  if(input == null){
+    alert("Choose a CSV file to upload")
+    return;
+  }
+  reader = new FileReader();  
+  reader.onload = function(event) {
+    var fileText = this.result;
+    console.log(fileText);
     if(fileText != undefined){
         var usersRead = {};
         users = null;
@@ -308,10 +315,14 @@ function setupUsers(){
         }
         console.log(usersRead)
         users = usersRead;
+        setupSlotMachine(users);
+        closeUploadWindow();
         return;
     }
+    alert("Please upload a valid CSV File");
     return;
-  });
+  };
+  reader.readAsText(input)
 }
 
 ( function updateInstrustries() {
@@ -396,6 +407,7 @@ function readTextFile(file, then) {
 $('.theme-selector').on('click', function(e) {
   var themeSelected = $(e.target).attr('name');
   $('header').backstretch('images/presentation/' + themeSelected + '/background.jpg');
+  $('#uploadContainer').backstretch('images/presentation/' + themeSelected + '/background.jpg');
 
   readTextFile('images/presentation/' + themeSelected + '/colors.json', function(fileText) {
     if(fileText != undefined) {
@@ -408,6 +420,7 @@ $('.theme-selector').on('click', function(e) {
 
       $('.darkest-color-text').css('color', themeSettings['darkest-color'].hex);
       $('.darkest-color-icon').css('color', themeSettings['darkest-color'].hex);
+      
     }
   });
 });
