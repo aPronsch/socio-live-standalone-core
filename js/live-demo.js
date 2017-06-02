@@ -68,11 +68,16 @@ var options = {
   suffix : ''
 };
 
+var userParams = {
+  number: 3
+};
+
 var $title = $('title');
 var $eventName = $('[name="event_name"]');
 var $settingsPanel = $('div[class="panel-inner"]');
 
-var users = {
+var users = {}
+/*var users = {
   1: new BasicUser(1, "Desmond", "Strickland", "Fishery", Date.now()),
   2: new BasicUser(2, 'Thaddeus','Galvan','Professional Training & Coaching', Date.now()),
   3: new BasicUser(3, 'Lamont','Friedman','Automotive', Date.now()),
@@ -98,7 +103,7 @@ var users = {
   23: new BasicUser(23, 'Britney','Pennington','Recreational Facilities and Services', Date.now()),
   24: new BasicUser(24, 'Phyllis','Chung','International Affairs', Date.now()),
   25: new BasicUser(25, 'Susanne','Clark','Facilities Services', Date.now())
-};
+};*/
 
 var orderedUsers = [];
 var nextUser = 0;
@@ -139,6 +144,7 @@ function runControl() {
         console.log("Expecting: " + users[control.winner].getFullName() + " with id: " + control.winner);
         var $startStopBtn = $('#start-stop-button');
         $startStopBtn.removeClass('running');
+        $startStopBtn.css('visibility', 'visible');
         $startStopBtn.html("SPIN");
         control.stopping = false;
         clearInterval(control.interval);
@@ -164,14 +170,46 @@ function runControl() {
   }, control.speed);
 }
 
+function openUploadWindow() {
+ $("#uploadContainer").addClass('animated zoomIn')
+ $("#uploadContainer").css({
+   visibility:'visible'
+ });
+
+
+}
+
 function openAttendeeDrawing() {
+  openUploadWindow()
   document.getElementById('attendee-drawing-overlay').style.width = "100%";
+  
+}
+
+function setupSlotMachine(usersDictionary) {
+  var $carousel = $('#carousel');
+  var current = 0;
+  if(usersDictionary != null){
+    for(var key in usersDictionary) {
+      var thisUser = usersDictionary[key];
+      orderedUsers[current] = {index: current, id: thisUser.id, user: thisUser};
+      current = current + 1;
+    }
+
+    var figures = $carousel.find('figure');
+    for(var i = 0; i < 6 && i < orderedUsers.length; i++) {
+      figures[i].appendChild(orderedUsers[i].user.buildHtmlForAttendeeDrawing());
+    }
+    nextUser = i + 1;
+
+    control.speed = 2000;
+    runControl()
+  }
 
   var $slotMachine = $('#planeMachine');
   $slotMachine.empty();
   temporary = true;
-  setupSlotMachine(users);
 
+  $('#start-stop-button').css('visibility', 'visible');
   $('#start-stop-button').off('click').on('click', function(e) {
 
     if(orderedUsers.length  < 6) {
@@ -181,9 +219,11 @@ function openAttendeeDrawing() {
       var $startStopBtn = $('#start-stop-button');
       if ($startStopBtn.hasClass('running')) {
         control.stopping = true;
+        $('#start-stop-button').css('visibility', 'hidden');
       } else {
         control.stopping = false;
         control.speed = 100;
+
 
         var $startStopBtn = $('#start-stop-button');
         $startStopBtn.addClass('running');
@@ -196,33 +236,23 @@ function openAttendeeDrawing() {
   })
 }
 
-function setupSlotMachine(usersDictionary) {
-  var $carousel = $('#carousel');
-  var current = 0;
-  for(var key in usersDictionary) {
-    var thisUser = usersDictionary[key];
-    orderedUsers[current] = {index: current, id: thisUser.id, user: thisUser};
-    current = current + 1;
-  }
-
-  var figures = $carousel.find('figure');
-  for(var i = 0; i < 6 && i < orderedUsers.length; i++) {
-    figures[i].appendChild(orderedUsers[i].user.buildHtmlForAttendeeDrawing());
-  }
-  nextUser = i + 1;
-
-  control.speed = 2000;
-  runControl()
-}
-
 function closeAttendeeDrawing() {
   document.getElementById('attendee-drawing-overlay').style.width = "0%";
+  closeUploadWindow();
 
   $('#carousel').find('figure').empty();
   clearInterval(control.interval);
   var $startStopBtn = $('#start-stop-button');
   $startStopBtn.removeClass('running');
   $startStopBtn.html('SPIN');
+  $startStopBtn.css('visibility','hidden  ')
+}
+
+function closeUploadWindow(){
+  $("#uploadContainer").removeClass('animated zoomIn')
+  $("#uploadContainer").css({
+   visibility:'hidden'
+ });
 }
 
 var attendees = new CountUp("attendeesCount", 0, 0, 0, 2.5, options);
@@ -230,6 +260,7 @@ attendees.start();
 var handshakes = new CountUp("handshakesCount", 0, 0, 0, 2.5, options);
 handshakes.start();
 var $industriesList = $('#industriesList');
+
 
 
 
@@ -257,6 +288,58 @@ var industriesCollection = "Accounting,Airlines/Aviation,Alternative Dispute Res
 var industriesHash = {};
 for(var i = 0; i < industriesCollection.length; i++) {
   industriesHash[industriesCollection[i]] = 0;
+}
+
+  // Parse CSV file into list of users for carousel drawing
+
+function setupUsers(){
+  // file location temporary until upload function implemented
+  input = document.getElementById("attendeeFile").files[0];
+  if(input == null){
+    alert("Choose a CSV file to upload")
+    return;
+  }
+  console.log(input.name);
+  if(input.name.match(/ *\.csv$/) == null){
+    alert("Filetype must be .csv")
+    return; 
+  }
+  reader = new FileReader();  
+  reader.onload = function(event) {
+    var fileText = this.result;
+    console.log(fileText);
+    if(fileText != undefined) {
+        var usersRead = {};
+        users = {};
+        var entries = fileText.split(/[\r]?[\n]|[\r]/);
+        //console.log(JSON.stringify(fileText));
+        for(var key in entries) {
+
+          var params = entries[key].split(",");
+          
+          if (params.length != userParams.number) {
+            if(params.length == 1 && params[0] == "") {
+              break;
+            } else {
+              alert("Error: entries must contain " + userParams.number + " fields:\n [First Name], [Last Name], [Company]");
+              return;  
+            }
+            
+          }
+          //TODO: implement arbitrary number of parameters.
+          usersRead[key] = new BasicUser(key, params[0], params[1], params[2], Date.now());
+          
+        }
+        console.log(usersRead.length)
+        users = usersRead;
+        setupSlotMachine(users);
+        closeUploadWindow();
+        return;
+    }
+    alert("Please upload a valid CSV File");
+    return;
+  };
+  reader.readAsText(input)
 }
 
 ( function updateInstrustries() {
@@ -341,6 +424,7 @@ function readTextFile(file, then) {
 $('.theme-selector').on('click', function(e) {
   var themeSelected = $(e.target).attr('name');
   $('header').backstretch('images/presentation/' + themeSelected + '/background.jpg');
+  $('#uploadContainer').backstretch('images/presentation/' + themeSelected + '/background.jpg');
 
   readTextFile('images/presentation/' + themeSelected + '/colors.json', function(fileText) {
     if(fileText != undefined) {
@@ -353,6 +437,7 @@ $('.theme-selector').on('click', function(e) {
 
       $('.darkest-color-text').css('color', themeSettings['darkest-color'].hex);
       $('.darkest-color-icon').css('color', themeSettings['darkest-color'].hex);
+      
     }
   });
 });

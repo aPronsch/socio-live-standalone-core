@@ -97,8 +97,12 @@
   padding:20px 39px;
   text-decoration:none;
   text-shadow:0px 1px 0px #263666;
+  
 }
 
+#start-stop-button { 
+  visibility: hidden;  
+}
 
 .running {
     border-color: red;

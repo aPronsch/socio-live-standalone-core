@@ -141,6 +141,9 @@
     <a href="javascript:void(0)" class="closebtn" style="z-index: 1000" onclick="closeAttendeeDrawing()">&times;</a>
 
     <div class="overlay-content container" style="margin-top: 15%;">
+        
+        
+
         <div class="col-md-12 col-lg-8 col-lg-offset-2" id="carousel-wrapper">
             <div id="carousel">
                 <figure></figure>
@@ -160,6 +163,26 @@
     </div>
 </div>
 
+<div class="pop-up" id="uploadContainer">
+
+   
+   <div id="uploadContent">
+        <!--<a href="javascript:void(0)" class="closebtn" style="z-index: 1000" onclick="closeUploadWindow()">&times;</a>-->
+       <h1 id="uploadHead">
+           Upload your list of attendees for the drawing            
+        </h1>
+        <h3 id="uploadSubHeader">
+            (Must be in .CSV format)
+        </h3>
+        <form id="uploadForm">
+            <input type="file" name="attendeeUpload" id="attendeeFile" >
+            </input>
+        </form>
+        <button id="uploadButton" class="start-stop-button" onclick="setupUsers()">
+                UPLOAD
+            </button>
+    </div>
+</div>
 
 <!-- END HEADER -->
 
