@@ -144,6 +144,7 @@ function runControl() {
         console.log("Expecting: " + users[control.winner].getFullName() + " with id: " + control.winner);
         var $startStopBtn = $('#start-stop-button');
         $startStopBtn.removeClass('running');
+        $startStopBtn.css('visibility', 'visible');
         $startStopBtn.html("SPIN");
         control.stopping = false;
         clearInterval(control.interval);
@@ -208,6 +209,7 @@ function setupSlotMachine(usersDictionary) {
   $slotMachine.empty();
   temporary = true;
 
+  $('#start-stop-button').css('visibility', 'visible');
   $('#start-stop-button').off('click').on('click', function(e) {
 
     if(orderedUsers.length  < 6) {
@@ -217,9 +219,11 @@ function setupSlotMachine(usersDictionary) {
       var $startStopBtn = $('#start-stop-button');
       if ($startStopBtn.hasClass('running')) {
         control.stopping = true;
+        $('#start-stop-button').css('visibility', 'hidden');
       } else {
         control.stopping = false;
         control.speed = 100;
+
 
         var $startStopBtn = $('#start-stop-button');
         $startStopBtn.addClass('running');
@@ -307,8 +311,15 @@ function setupUsers(){
           var params = entries[key].split(",")
           console.log(params)
           if (params.length != userParams.number) {
-            alert("Error: entries must contain " + userParams.number + "fields:\n [First Name],[Last Name],[Company]");
-            return;
+            if(params.length == 1 && params[0] == "")
+            {
+              break;
+            }
+            else{
+              alert("Error: entries must contain " + userParams.number + " fields:\n [First Name], [Last Name], [Company]");
+              return;  
+            }
+            
           }
           //TODO: implement arbitrary number of parameters.
           usersRead[key] = new BasicUser(key, params[0], params[1], params[2], Date.now());
