@@ -245,6 +245,7 @@ function closeAttendeeDrawing() {
   var $startStopBtn = $('#start-stop-button');
   $startStopBtn.removeClass('running');
   $startStopBtn.html('SPIN');
+  $startStopBtn.css('visibility','hidden  ')
 }
 
 function closeUploadWindow(){
@@ -298,24 +299,28 @@ function setupUsers(){
     alert("Choose a CSV file to upload")
     return;
   }
+  console.log(input.name);
+  if(input.name.match(/ *\.csv$/) == null){
+    alert("Filetype must be .csv")
+    return; 
+  }
   reader = new FileReader();  
   reader.onload = function(event) {
     var fileText = this.result;
     console.log(fileText);
-    if(fileText != undefined){
+    if(fileText != undefined) {
         var usersRead = {};
-        users = null;
+        users = {};
         var entries = fileText.split(/[\r]?[\n]|[\r]/);
         //console.log(JSON.stringify(fileText));
-        for(var key in entries){
-          var params = entries[key].split(",")
-          console.log(params)
+        for(var key in entries) {
+
+          var params = entries[key].split(",");
+          
           if (params.length != userParams.number) {
-            if(params.length == 1 && params[0] == "")
-            {
+            if(params.length == 1 && params[0] == "") {
               break;
-            }
-            else{
+            } else {
               alert("Error: entries must contain " + userParams.number + " fields:\n [First Name], [Last Name], [Company]");
               return;  
             }
@@ -323,8 +328,9 @@ function setupUsers(){
           }
           //TODO: implement arbitrary number of parameters.
           usersRead[key] = new BasicUser(key, params[0], params[1], params[2], Date.now());
+          
         }
-        console.log(usersRead)
+        console.log(usersRead.length)
         users = usersRead;
         setupSlotMachine(users);
         closeUploadWindow();

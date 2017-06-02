@@ -878,6 +878,7 @@ footer a:hover {
 
 #uploadContainer {
     height: 400px;
+    min-width: 360px;
     z-index: 1;
     -webkit-transform: translateY(-50%);
     -moz-transform:    translateY(-50%);
@@ -897,6 +898,7 @@ footer a:hover {
     height: 100%;
     background-color: rgba(255,255,255,0.8);
     padding: 24px;
+    position: relative;
 }
 
 #uploadHead {
@@ -905,8 +907,17 @@ footer a:hover {
 
 #uploadButton {
     margin: 0 auto;
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+
+    -webkit-transform: translateX(-50%);
+    -moz-transform:    translateX(-50%);
+    -ms-transform:     translateX(-50%);
+    -o-transform:      translateX(-50%);
+    transform:         translateX(-50%);    
 }
 
 #attendeeFile {
-    margin: 0 auto;
+    margin: 24px auto;
 }
